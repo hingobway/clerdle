@@ -19,39 +19,41 @@
 
 #include "UX.h"
 
+void Puzzle::seed()
+{
+  static bool done = false;
+  if (!done)
+  {
+    std::srand(std::time(0));
+    done = true;
+  }
+}
+
 // CONSTRUCTOR Puzzle() //
 Puzzle::Puzzle()
 {
-  std::srand(std::time(0));
   // int form = rand() % 4;
   int form = 0;
   switch (form)
   {
   case 0: // aa?bb=zz [+-__]
-    // char s = (rand() % 2) ? '+' : '-';
-    char s = '+';
-
-    int mindbl{op(s, min(2), min(2))};
-    int maxdbl{op(s, max(2), min(2))};
-    int z{randrange(
-        (mindbl > min(2)) ? mindbl : min(2),
-        (maxdbl < max(2)) ? maxdbl : max(2))};
-    UX::printi((mindbl > min(2)) ? mindbl : min(2));
-    UX::printi((maxdbl < max(2)) ? maxdbl : max(2));
-    UX::printi(z);
-
-    int a{randrange(
-        min(2),
-        op(s, z, min(2), true))};
-    UX::printi(min(2));
-    UX::printi(op(s, z, min(2), true));
-    UX::printi(a);
-    op(s, z, min(2), true);
-    min(2);
-
-    int comp{op(s, z, min(2), true)};
-    // UX::printi()
-
+    char s{};
+    if (rand() % 2)
+    {
+      s = '+';
+      int z{randrange(min(2) + min(2), max(2))};
+      int a{randrange(min(2), z - min(2))};
+      int b{z - a};
+      this->answer_ = std::to_string(a) + s + std::to_string(b) + "=" + std::to_string(z);
+    }
+    else
+    {
+      s = '-';
+      int z{randrange(min(2), max(2) - min(2))};
+      int a{randrange(z + min(2), max(2))};
+      int b{a - z};
+      this->answer_ = std::to_string(a) + s + std::to_string(b) + "=" + std::to_string(z);
+    }
     break;
     // case 1: // a?bb=zzz [+_*_] [x or y first]
     //   //
@@ -63,6 +65,7 @@ Puzzle::Puzzle()
     //   //
     //   break;
   }
+  UX::print(this->answer_);
 }
 
 int Puzzle::op(char op, int a, int b, bool invert)

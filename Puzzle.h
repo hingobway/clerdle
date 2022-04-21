@@ -18,6 +18,7 @@ class Puzzle
 {
 private:
   std::string answer_;
+  static void seed();
 
   static int randrange(int a, int b) { return rand() % (1 + b - a) + a; }
   static int op(char, int, int, bool = false);

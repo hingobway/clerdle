@@ -25,7 +25,11 @@ int main(int argc, char *argv[])
   (void)args;
 
   UX::welcome();
-  Puzzle{};
+
+  for (int i = 0; i < 15; i++)
+  {
+    Puzzle{};
+  }
 
   return 0;
 }
