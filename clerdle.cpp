@@ -12,10 +12,20 @@
 //
 // /////////////////////////////////////////////////////////
 
-int main()
-{
+#include <vector>
+#include <string>
 
-  //
+#include "UX.h"
+#include "Puzzle.h"
+
+int main(int argc, char *argv[])
+{
+  std::vector<std::string> args(argv, argv + argc);
+
+  (void)args;
+
+  UX::welcome();
+  Puzzle{};
 
   return 0;
 }
