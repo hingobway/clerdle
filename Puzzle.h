@@ -22,9 +22,14 @@ private:
   std::string answer_;
   std::stringstream answerstream_;
   template <typename T>
-  void setAnswer(T);
+  std::string answerToString(T);
   template <typename T, typename... Next>
-  void setAnswer(T, Next...);
+  std::string answerToString(T, Next...);
+
+  void generateProblem();
+  std::string eqnGenerate222();
+  std::string eqnGenerate123();
+  std::string eqnGenerate1112();
 
   static void seed();
 
@@ -34,8 +39,15 @@ private:
   static int min(int);
   static int max(int);
 
+  static int opIterate(std::vector<std::string> &, int = 0);
+
 public:
   Puzzle();
+
+  std::string getAnswer() const { return answer_; }
+  std::string compare(std::string) const;
+
+  static bool verify(std::string);
 };
 
 #endif

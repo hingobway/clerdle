@@ -23,11 +23,17 @@ int main(int argc, char *argv[])
   std::vector<std::string> args(argv, argv + argc);
   (void)args; // TODO enable multiple modes
 
-  UX::welcome();
+  UX::welcome("test");
 
-  for (int i = 0; i < 15; i++)
+  auto puzzle{Puzzle()};
+
+  if (puzzle.verify(puzzle.getAnswer()))
   {
-    Puzzle{};
+    UX::prints(puzzle.getAnswer(), "valid problem!");
+  }
+  else
+  {
+    UX::prints(puzzle.getAnswer(), "ERROR");
   }
 
   return 0;

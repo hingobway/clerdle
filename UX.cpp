@@ -21,20 +21,21 @@ void UX::welcome()
 {
   UX::splash();
 }
-
-void UX::print(std::string output)
+void UX::welcome(std::string mode)
 {
-  std::cout << output << "\n";
-}
-void UX::printi(int output)
-{
-  std::cout << output << "\n";
+  UX::splash(mode == "test");
 }
 
-void UX::splash()
+void UX::splash(bool test)
 {
   std::cout << Color::setColor(Color::white, Color::green)
-            << "                             " << Color::reset() << "\n"
+            << "                    ";
+  if (test)
+    std::cout << Color::setColor(Color::red, Color::white)
+              << "TEST MODE";
+  else
+    std::cout << "         ";
+  std::cout << Color::reset() << "\n"
             << Color::setColor(Color::white, Color::green)
             << "===  C  L  E  R  D  L  E  ===" << Color::reset() << "\n"
             << Color::setColor(Color::white, Color::green)

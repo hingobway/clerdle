@@ -13,16 +13,48 @@
 #define UX_H
 
 #include <string>
+#include <iostream>
 
 class UX
 {
 private:
-  static void splash();
+  static void splash(bool = false);
 
 public:
   static void welcome();
-  static void print(std::string);
-  static void printi(int);
+  static void welcome(std::string);
+
+  template <typename T>
+  static void print(T el) { std::cout << el << "\n"; }
+  template <typename T>
+  static void prints(T el) { std::cout << el << "\n"; }
+  template <typename T>
+  static void print1(T el) { std::cout << el << " "; };
+  template <typename T, typename... Next>
+  static void print(T, Next...);
+  template <typename T, typename... Next>
+  static void prints(T, Next...);
+  template <typename T, typename... Next>
+  static void print1(T, Next...);
 };
+
+template <typename T, typename... Next>
+void UX::print(T el, Next... n)
+{
+  std::cout << el << "\n";
+  print(n...);
+}
+template <typename T, typename... Next>
+void UX::prints(T el, Next... n)
+{
+  std::cout << el << " ";
+  prints(n...);
+}
+template <typename T, typename... Next>
+void UX::print1(T el, Next... n)
+{
+  std::cout << el << " ";
+  print1(n...);
+}
 
 #endif
