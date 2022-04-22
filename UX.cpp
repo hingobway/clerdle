@@ -26,6 +26,15 @@ void UX::welcome(std::string mode)
   UX::splash(mode == "test");
 }
 
+void UX::printTestAnswer(std::string answer)
+{
+  std::cout << Color::setColor(Color::green, Color::black)
+            << "CORRECT ANSWER:  "
+            << Color::setColor(Color::white, Color::black)
+            << answer << " "
+            << Color::reset() << "\n\n";
+}
+
 void UX::splash(bool test)
 {
   std::cout << Color::setColor(Color::white, Color::green)

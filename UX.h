@@ -24,6 +24,8 @@ public:
   static void welcome();
   static void welcome(std::string);
 
+  static void printTestAnswer(std::string);
+
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }
   template <typename T>

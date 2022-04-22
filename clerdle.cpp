@@ -15,26 +15,30 @@
 #include <vector>
 #include <string>
 
+#include "AppMode.h"
 #include "UX.h"
 #include "Puzzle.h"
 
 int main(int argc, char *argv[])
 {
-  std::vector<std::string> args(argv, argv + argc);
-  (void)args; // TODO enable multiple modes
 
-  UX::welcome("test");
+  std::vector<std::string> args(argv + 1, argv + argc);
+  auto mode{AppMode(args)};
 
+  UX::welcome(mode.test() ? "test" : "");
+
+  if (mode.generate())
+  { // for -g mode, print some answers and exit
+    for (int i = 0; i < mode.generate(); i++)
+      UX::prints(Puzzle().getAnswer(), '(', i + 1, ')');
+    return 0;
+  }
+
+  // create this puzzle
   auto puzzle{Puzzle()};
 
-  if (puzzle.verify(puzzle.getAnswer()))
-  {
-    UX::prints(puzzle.getAnswer(), "valid problem!");
-  }
-  else
-  {
-    UX::prints(puzzle.getAnswer(), "ERROR");
-  }
+  if (mode.test())
+    UX::printTestAnswer(puzzle.getAnswer());
 
   return 0;
 }
