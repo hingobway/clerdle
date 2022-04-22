@@ -13,15 +13,24 @@
 #define PUZZLE_H
 
 #include <string>
+#include <sstream>
+#include <vector>
 
 class Puzzle
 {
 private:
   std::string answer_;
+  std::stringstream answerstream_;
+  template <typename T>
+  void setAnswer(T);
+  template <typename T, typename... Next>
+  void setAnswer(T, Next...);
+
   static void seed();
 
   static int randrange(int a, int b) { return rand() % (1 + b - a) + a; }
-  static int op(char, int, int, bool = false);
+  static int op(char, int, int);
+  static char inv(char);
   static int min(int);
   static int max(int);
 
