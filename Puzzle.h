@@ -16,6 +16,8 @@
 #include <sstream>
 #include <vector>
 
+#include "Guess.h"
+
 class Puzzle
 {
 private:
@@ -43,9 +45,10 @@ private:
 
 public:
   Puzzle();
+  Puzzle(std::string);
 
   std::string getAnswer() const { return answer_; }
-  std::string compare(std::string) const;
+  Guess compare(std::string) const;
 
   static bool verify(std::string);
 };

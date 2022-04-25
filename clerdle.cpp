@@ -18,13 +18,15 @@
 #include "AppMode.h"
 #include "UX.h"
 #include "Puzzle.h"
+#include "Game.h"
 
 int main(int argc, char *argv[])
 {
 
   std::vector<std::string> args(argv + 1, argv + argc);
-  auto mode{AppMode(args)};
+  AppMode mode(args);
 
+  // print logo
   UX::welcome(mode.test() ? "test" : "");
 
   if (mode.generate())
@@ -35,10 +37,23 @@ int main(int argc, char *argv[])
   }
 
   // create this puzzle
-  auto puzzle{Puzzle()};
+  Puzzle *puzzle{new Puzzle("4+8*3=28")};
+  // Puzzle *puzzle{new Puzzle()};
 
-  if (mode.test())
-    UX::printTestAnswer(puzzle.getAnswer());
+  if (mode.test()) // in test mode, print the answer first
+    UX::printTestAnswer(puzzle->getAnswer());
+
+  // TODO should this go in a Game() default ctor?
+  // get playername if needed
+  std::string playerName{mode.playerName()};
+  if (!playerName.length())
+  {
+    playerName = UX::promptPlayerName();
+  }
+
+  UX::prints("player name: ", playerName, "\n");
+
+  Game game(puzzle);
 
   return 0;
 }

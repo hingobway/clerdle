@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "UX.h"
+#include "Guess.h"
 
 /* HARDGEN attempts
  *   the number of attempts to brute force "hard-gen" (3-term)
@@ -51,6 +52,11 @@ Puzzle::Puzzle()
 
   // create the puzzle and add it to the object's `answer_` member
   this->generateProblem();
+}
+Puzzle::Puzzle(std::string answer)
+{
+  Puzzle::seed();
+  this->answer_ = answer;
 }
 
 /* generateProblem()
@@ -201,12 +207,10 @@ bool Puzzle::verify(std::string guess)
       elements.push_back(std::string(1, c));
     }
   }
-  elements.push_back(nbuf);
+  elements.pop_back(); // remove equals sign
 
   // separate given answer and remove it from elements vector
-  int givenAnswer{std::stoi(*(elements.end() - 1))};
-  for (int i = 0; i < 2; i++)
-    elements.pop_back();
+  int givenAnswer{std::stoi(nbuf)};
 
   // run the recursive iteration function to find answer to provided calculation
   int computedAnswer{opIterate(elements)};
@@ -228,8 +232,17 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
 
     if ((!stage && (el == "*" || el == "/")) || (stage && (el == "+" || el == "-")))
     { // look for the next operator in PEMDAS order
+      // TODO need to check to make sure a and b are actually numbers first!!
       int a{std::stoi(elements.at(i - 1))};
       int b{std::stoi(elements.at(i + 1))};
+
+      if (el[0] == '/' && a % b)
+      { // if any division doesn't result in an integer, immediately exit
+
+        elements.at(0) = "2147483647"; // max int value will always fail validation
+        stage = 1;
+        break;
+      }
 
       // evaluate this operator and replace it with its solution
       elements.at(i - 1) = std::to_string(op(el[0], a, b));
@@ -247,6 +260,69 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
   if (!broke && !stage) // mult. & div. is complete. continue to add. & subt.
     return opIterate(elements, 1);
   return opIterate(elements, stage);
+}
+
+Guess Puzzle::compare(std::string input) const
+{
+  Guess guess(input);
+  std::vector<char> nearbys;
+  for (int i = 0; i < int(this->answer_.length()); i++)
+  {
+    if (i >= int(input.length())) // protect against length mismatch
+      break;
+
+    Guess::charState state{};
+    if (input[i] == this->answer_[i])
+    {
+      state = Guess::correct;
+      nearbys.push_back(input[i]);
+    }
+    else
+    {
+      bool found = false;
+      for (auto c : this->answer_)
+      {
+
+        if (c == input[i])
+        {
+          int charCount{};
+          for (auto n : nearbys)
+            if (n == c)
+              charCount++;
+          if (charCount)
+          {
+            int actualCharCount{};
+            for (auto n : this->answer_)
+              if (n == c)
+                actualCharCount++;
+            if (charCount < actualCharCount)
+            {
+              found = true;
+              nearbys.push_back(c);
+              break;
+            }
+          }
+          else
+          {
+            found = true;
+            nearbys.push_back(c);
+            break;
+          }
+        }
+      }
+
+      if (found)
+      {
+        state = Guess::nearby;
+      }
+      else
+      {
+        state = Guess::incorrect;
+      }
+    }
+    guess.setInd(i, {0, state});
+  }
+  return guess;
 }
 
 /* answerToString()

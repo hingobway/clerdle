@@ -15,16 +15,23 @@
 #include <string>
 #include <iostream>
 
+#include "color.h"
+#include "Guess.h"
+
 class UX
 {
 private:
   static void splash(bool = false);
+
+  static std::string colorMap(Guess::charState);
 
 public:
   static void welcome();
   static void welcome(std::string);
 
   static void printTestAnswer(std::string);
+  static std::string promptPlayerName();
+  static void printRound(const std::vector<Guess> &);
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }
