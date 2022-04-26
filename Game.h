@@ -24,6 +24,8 @@ class Game
 private:
   Puzzle *puzzle_;
   std::vector<Guess> rounds_;
+  int completedRounds_;
+  Guess usedChars_;
 
 public:
   Game(Puzzle *);

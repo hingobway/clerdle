@@ -207,6 +207,8 @@ bool Puzzle::verify(std::string guess)
       elements.push_back(std::string(1, c));
     }
   }
+  if (!elements.size() || *(elements.end() - 1) != "=") // second to last term must be equals sign
+    return false;
   elements.pop_back(); // remove equals sign
 
   // separate given answer and remove it from elements vector
@@ -232,9 +234,26 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
 
     if ((!stage && (el == "*" || el == "/")) || (stage && (el == "+" || el == "-")))
     { // look for the next operator in PEMDAS order
-      // TODO need to check to make sure a and b are actually numbers first!!
-      int a{std::stoi(elements.at(i - 1))};
-      int b{std::stoi(elements.at(i + 1))};
+      int a{}, b{};
+      try
+      { // parse numbers around operator as integers
+        a = std::stoi(elements.at(i - 1));
+        b = std::stoi(elements.at(i + 1));
+      }
+      catch (std::invalid_argument const &err)
+      { // if there were 2 operators in a row, immediately exit
+        (void)err;
+        elements.at(0) = "2147483647"; // max int value will always fail validation
+        stage = 1;
+        break;
+      }
+      catch (std::out_of_range const &err)
+      { // if there were 2 operators in a row, immediately exit
+        (void)err;
+        elements.at(0) = "2147483647"; // max int value will always fail validation
+        stage = 1;
+        break;
+      }
 
       if (el[0] == '/' && a % b)
       { // if any division doesn't result in an integer, immediately exit

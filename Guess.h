@@ -30,8 +30,8 @@ public:
   Guess(int length = PUZZLE_LENGTH);
   Guess(std::string, int length = PUZZLE_LENGTH);
 
-  std::string string() const;
-  std::vector<GuessChar> guess() const;
+  std::string getString() const;
+  std::vector<GuessChar> getVector() const;
 
   void setInd(int, GuessChar);
   void set(const std::vector<GuessChar> &);

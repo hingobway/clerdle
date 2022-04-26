@@ -79,18 +79,41 @@ std::string UX::promptPlayerName()
   return name;
 }
 
-void UX::printRound(const std::vector<Guess> &rounds)
+void UX::beginRound(int round, const std::vector<Guess> &history, Guess usedChars)
+{
+  UX::print1("\nAttempt", round, "-");
+  for (auto c : usedChars.getVector())
+    std::cout << colorMap(c.state) << c.character;
+  std::cout << Color::reset() << "\n\n";
+
+  UX::printRound(history, 2);
+}
+
+std::string UX::promptGuess(bool showError)
+{
+  if (showError)
+    UX::print("Guesses must compute.");
+
+  std::string guess{};
+  std::cout << "> ";
+  std::getline(std::cin, guess);
+  // TODO validate input
+  return guess;
+}
+void UX::printRound(const std::vector<Guess> &rounds, int buffer)
 {
   for (auto round : rounds)
   {
-    for (auto c : round.guess())
+    for (int i = 0; i < buffer; i++)
+      std::cout << " ";
+    for (auto c : round.getVector())
     {
       std::cout << colorMap(c.state)
                 << c.character;
     }
     std::cout << Color::reset() << "\n";
   }
-  std::cout << std::endl;
+  // std::cout << std::endl;
 }
 
 //-----------------

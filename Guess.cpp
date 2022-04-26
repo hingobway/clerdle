@@ -47,11 +47,11 @@ void Guess::set(const std::vector<GuessChar> &guess)
   }
 }
 
-std::vector<Guess::GuessChar> Guess::guess() const
+std::vector<Guess::GuessChar> Guess::getVector() const
 {
   return this->guess_;
 }
-std::string Guess::string() const
+std::string Guess::getString() const
 {
   std::string out{};
   for (const GuessChar &c : this->guess_)

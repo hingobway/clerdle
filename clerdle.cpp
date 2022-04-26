@@ -37,8 +37,9 @@ int main(int argc, char *argv[])
   }
 
   // create this puzzle
-  Puzzle *puzzle{new Puzzle("4+8*3=28")};
-  // Puzzle *puzzle{new Puzzle()};
+  // Puzzle *puzzle{new Puzzle("4+8*3=28")};
+  // Puzzle *puzzle{new Puzzle("1*14-9=5")};
+  Puzzle *puzzle{new Puzzle()};
 
   if (mode.test()) // in test mode, print the answer first
     UX::printTestAnswer(puzzle->getAnswer());
