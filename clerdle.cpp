@@ -30,10 +30,6 @@ int main(int argc, char *argv[])
   // print logo
   UX::welcome(mode.isTest() ? "test" : "");
 
-  UX::prints(Puzzle::verify("3*4*5=60"));
-
-#if 0
-
   if (mode.isGenerate())
   { // for -g mode, print some answers and exit
     for (int i = 0; i < mode.isGenerate(); i++)
@@ -65,8 +61,6 @@ int main(int argc, char *argv[])
   std::string dump{};
   std::getline(std::cin, dump);
   (void)dump;
-
-#endif
 
   return 0;
 }
