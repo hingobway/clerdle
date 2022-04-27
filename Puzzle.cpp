@@ -16,6 +16,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 
 #include "UX.h"
 #include "Guess.h"
@@ -147,7 +148,6 @@ std::string Puzzle::eqnGenerate123()
 std::string Puzzle::eqnGenerate1112()
 {
   std::vector<std::string> ops{"+", "-", "*", "/"};
-
   std::vector<std::string> equation{};
   std::string answer{};
 
@@ -157,7 +157,7 @@ std::string Puzzle::eqnGenerate1112()
     equation.clear();
     for (int i = 0; i < 3; i++)
     {
-      equation.push_back(std::to_string(randrange(1, 9)));
+      equation.push_back(std::to_string(randrange(min(1), max(1))));
       equation.push_back(ops.at(rand() % ops.size()));
     }
     equation.pop_back();
@@ -169,16 +169,12 @@ std::string Puzzle::eqnGenerate1112()
 
     attempts++;
   }
-  if (attempts >= HARDGEN_ATTEMPTS)
-  { // stop trying attempts after a given number of tries
+  if (attempts >= HARDGEN_ATTEMPTS) // stop trying attempts after a given number of tries
     return "";
-  }
 
   std::string out{};
   for (auto s : equation)
-  {
     out += s;
-  }
   out += "=" + answer;
   return out;
 }
@@ -227,7 +223,6 @@ bool Puzzle::verify(std::string guess)
  */
 int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
 {
-  bool broke{false};
   for (int i = 0; i < int(elements.size()); i++)
   {
     std::string el = elements.at(i);
@@ -241,13 +236,6 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
         b = std::stoi(elements.at(i + 1));
       }
       catch (std::invalid_argument const &err)
-      { // if there were 2 operators in a row, immediately exit
-        (void)err;
-        elements.at(0) = "2147483647"; // max int value will always fail validation
-        stage = 1;
-        break;
-      }
-      catch (std::out_of_range const &err)
       { // if there were 2 operators in a row, immediately exit
         (void)err;
         elements.at(0) = "2147483647"; // max int value will always fail validation
@@ -268,23 +256,32 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
       for (int j = 0; j < 2; j++)
         elements.erase(elements.begin() + i);
 
-      // if this has been successful we need to start from the beginning
-      broke = true;
-      break;
+      // if this was successful we need to start from the beginning
+      i = 0;
     }
   }
 
-  if (!broke && stage) // the equation is solved
-    return std::stoi(elements.at(0));
-  if (!broke && !stage) // mult. & div. is complete. continue to add. & subt.
+  if (!stage) // mult. & div. is complete. continue to add. & subt.
     return opIterate(elements, 1);
-  return opIterate(elements, stage);
+  else // the equation is solved
+    return std::stoi(elements.at(0));
 }
 
 Guess Puzzle::compare(std::string input) const
 {
   Guess guess(input);
   std::vector<char> nearbys;
+  std::map<char, int> correctCharCounts{};
+  std::map<char, int> charMatches{};
+  for (auto c : this->answer_)
+  {
+    charMatches[c] = 0;
+    if (correctCharCounts[c])
+      correctCharCounts[c]++;
+    else
+      correctCharCounts[c] = 1;
+  }
+
   for (int i = 0; i < int(this->answer_.length()); i++)
   {
     if (i >= int(input.length())) // protect against length mismatch
@@ -294,53 +291,35 @@ Guess Puzzle::compare(std::string input) const
     if (input[i] == this->answer_[i])
     {
       state = Guess::correct;
-      nearbys.push_back(input[i]);
+      charMatches[input[i]]++;
     }
     else
     {
-      bool found = false;
-      for (auto c : this->answer_)
-      {
-
-        if (c == input[i])
-        {
-          int charCount{};
-          for (auto n : nearbys)
-            if (n == c)
-              charCount++;
-          if (charCount)
-          {
-            int actualCharCount{};
-            for (auto n : this->answer_)
-              if (n == c)
-                actualCharCount++;
-            if (charCount < actualCharCount)
-            {
-              found = true;
-              nearbys.push_back(c);
-              break;
-            }
-          }
-          else
-          {
-            found = true;
-            nearbys.push_back(c);
-            break;
-          }
-        }
-      }
-
-      if (found)
-      {
+      bool isNearby = charMatches.find(input[i]) != charMatches.end();
+      if (isNearby)
         state = Guess::nearby;
-      }
       else
-      {
         state = Guess::incorrect;
-      }
     }
     guess.setInd(i, {0, state});
   }
+
+  std::vector<Guess::GuessChar> correctedGuess = guess.getVector();
+  for (Guess::GuessChar &c : correctedGuess)
+  {
+    if (c.state == Guess::nearby)
+    {
+      if (charMatches[c.character] >= correctCharCounts[c.character])
+      {
+        c.state = Guess::incorrect;
+      }
+      else
+      {
+        charMatches[c.character]++;
+      }
+    }
+  }
+  guess.set(correctedGuess);
   return guess;
 }
 

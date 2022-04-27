@@ -36,9 +36,10 @@ Game::Game(Puzzle *puzzle) : puzzle_{puzzle}, completedRounds_{0}
   this->usedChars_ = Guess(chars.size());
   this->usedChars_.set(chars);
 
+  UX::beginGame();
+  bool won{};
   for (int i = 0; i < NUM_ROUNDS; i++)
   {
-    UX::beginRound(i + 1, this->rounds_, this->usedChars_);
     std::string guess{};
     int attempt{};
     while (true)
@@ -50,27 +51,29 @@ Game::Game(Puzzle *puzzle) : puzzle_{puzzle}, completedRounds_{0}
     }
     this->rounds_.at(i) = this->puzzle_->compare(guess);
     auto newChars = this->usedChars_.getVector();
+    int correctCount{};
     for (auto &c : this->rounds_.at(i).getVector())
-    {
+    { // TODO clean this
+      if (c.state == Guess::correct)
+        correctCount++;
       for (auto &c2 : newChars)
       {
         if (c2.character == c.character)
         {
-          if (!(c2.state == Guess::correct || c2.state == Guess::nearby))
+          if (c.state == Guess::correct || !(c2.state == Guess::correct || c2.state == Guess::nearby))
             c2.state = c.state;
-
           break;
         }
       }
     }
-    // TODO clean all this up.
-    // TODO actually check if a guess is fully correct
     this->usedChars_.set(newChars);
-    // UX::printRound(this->rounds_);
+    won = correctCount == int(this->rounds_.at(i).getString().length());
+    UX::printRound(i + 1, this->rounds_, this->usedChars_, won ? i : -1);
+    if (won)
+      break;
   }
+  if (!won)
+    UX::printLoss();
 
-  // this->rounds_.at(0) = this->puzzle_->compare("8+43/=37");
-  // this->rounds_.at(1) = this->puzzle_->compare(this->puzzle_->getAnswer());
-
-  // UX::printRound(this->rounds_);
+  // record stats here
 }

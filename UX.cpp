@@ -78,15 +78,18 @@ std::string UX::promptPlayerName()
   }
   return name;
 }
-
-void UX::beginRound(int round, const std::vector<Guess> &history, Guess usedChars)
+void UX::beginGame()
 {
-  UX::print1("\nAttempt", round, "-");
+  UX::print("Enter your first guess:", "  ........");
+}
+void UX::printRound(int round, const std::vector<Guess> &history, Guess usedChars, int won)
+{
+  UX::print1("\nGuess", round, "-");
   for (auto c : usedChars.getVector())
     std::cout << colorMap(c.state) << c.character;
   std::cout << Color::reset() << "\n\n";
 
-  UX::printRound(history, 2);
+  UX::printHistory(history, won, 2);
 }
 
 std::string UX::promptGuess(bool showError)
@@ -100,20 +103,32 @@ std::string UX::promptGuess(bool showError)
   // TODO validate input
   return guess;
 }
-void UX::printRound(const std::vector<Guess> &rounds, int buffer)
+void UX::printHistory(const std::vector<Guess> &rounds, int won, int buffer)
 {
-  for (auto round : rounds)
+  for (int i = 0; i < int(rounds.size()); i++)
   {
-    for (int i = 0; i < buffer; i++)
+    const Guess &round = rounds.at(i);
+    for (int j = 0; j < buffer; j++)
       std::cout << " ";
     for (auto c : round.getVector())
     {
       std::cout << colorMap(c.state)
                 << c.character;
     }
-    std::cout << Color::reset() << "\n";
+    std::cout << Color::reset()
+              << ((i == won) ? UX::wonMsg() : "")
+              << "\n";
   }
-  // std::cout << std::endl;
+}
+std::string UX::wonMsg()
+{
+  return Color::setFg(Color::green) + " << YOU WON!" + Color::reset();
+}
+void UX::printLoss()
+{
+  std::cout << "\n"
+            << Color::setFg(Color::red)
+            << "You lose!" << Color::reset() << "\n";
 }
 
 //-----------------

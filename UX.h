@@ -24,7 +24,8 @@ private:
   static void splash(bool = false);
 
   static std::string colorMap(Guess::charState);
-  static void printRound(const std::vector<Guess> &, int = 0);
+  static void printHistory(const std::vector<Guess> &, int, int = 0);
+  static std::string wonMsg();
 
 public:
   static void welcome();
@@ -32,8 +33,10 @@ public:
 
   static void printTestAnswer(std::string);
   static std::string promptPlayerName();
-  static void beginRound(int, const std::vector<Guess> &, Guess);
+  static void beginGame();
+  static void printRound(int, const std::vector<Guess> &, Guess, int = 0);
   static std::string promptGuess(bool = false);
+  static void printLoss();
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }

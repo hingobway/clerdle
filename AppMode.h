@@ -25,9 +25,9 @@ private:
 public:
   AppMode(const std::vector<std::string> &);
 
-  bool test() const { return test_; }
-  int generate() const { return generate_; }
-  std::string playerName() const { return playerName_; }
+  bool isTest() const { return test_; }
+  int isGenerate() const { return generate_; }
+  std::string getPlayerName() const { return playerName_; }
 };
 
 #endif
