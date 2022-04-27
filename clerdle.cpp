@@ -55,6 +55,14 @@ int main(int argc, char *argv[])
   UX::prints("player name: ", playerName, "\n");
 
   Game game(puzzle);
+  if (game.won())
+  {
+    UX::prints("STATS: game won in", game.getRounds(), "rounds.");
+  }
+  else
+  {
+    UX::prints("STATS: game lost.");
+  }
 
   // TODO move to UX
   std::cout << "\nPress ENTER to exit... ";

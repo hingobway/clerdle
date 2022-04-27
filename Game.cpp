@@ -36,8 +36,14 @@ Game::Game(Puzzle *puzzle) : puzzle_{puzzle}, completedRounds_{0}
   this->usedChars_ = Guess(chars.size());
   this->usedChars_.set(chars);
 
-  UX::beginGame();
-  bool won{};
+  this->play();
+
+  // record stats here
+}
+
+void Game::play()
+{
+  UX::printGameStart(this->puzzle_->getAnswer().length());
   for (int i = 0; i < NUM_ROUNDS; i++)
   {
     std::string guess{};
@@ -45,7 +51,7 @@ Game::Game(Puzzle *puzzle) : puzzle_{puzzle}, completedRounds_{0}
     while (true)
     {
       guess = UX::promptGuess(bool(attempt));
-      if (Puzzle::verify(guess))
+      if (guess.length() == this->puzzle_->getAnswer().length() && Puzzle::verify(guess))
         break;
       attempt++;
     }
@@ -67,13 +73,13 @@ Game::Game(Puzzle *puzzle) : puzzle_{puzzle}, completedRounds_{0}
       }
     }
     this->usedChars_.set(newChars);
-    won = correctCount == int(this->rounds_.at(i).getString().length());
-    UX::printRound(i + 1, this->rounds_, this->usedChars_, won ? i : -1);
-    if (won)
+    this->won_ = correctCount == int(this->rounds_.at(i).getString().length());
+    this->completedRounds_++;
+
+    UX::printRound(i + 1, this->rounds_, this->usedChars_, this->won_ ? i : -1);
+    if (this->won_)
       break;
   }
-  if (!won)
-    UX::printLoss();
-
-  // record stats here
+  if (!this->won_)
+    UX::printLoss(this->puzzle_->getAnswer());
 }

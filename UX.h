@@ -33,10 +33,10 @@ public:
 
   static void printTestAnswer(std::string);
   static std::string promptPlayerName();
-  static void beginGame();
+  static void printGameStart(int);
   static void printRound(int, const std::vector<Guess> &, Guess, int = 0);
   static std::string promptGuess(bool = false);
-  static void printLoss();
+  static void printLoss(std::string);
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }

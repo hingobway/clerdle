@@ -24,11 +24,18 @@ class Game
 private:
   Puzzle *puzzle_;
   std::vector<Guess> rounds_;
-  int completedRounds_;
   Guess usedChars_;
+
+  int completedRounds_;
+  bool won_;
+
+  void play();
 
 public:
   Game(Puzzle *);
+
+  bool won() const { return won_; }
+  int getRounds() const { return completedRounds_; }
 };
 
 #endif

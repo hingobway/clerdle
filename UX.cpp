@@ -78,9 +78,12 @@ std::string UX::promptPlayerName()
   }
   return name;
 }
-void UX::beginGame()
+void UX::printGameStart(int problemLength)
 {
-  UX::print("Enter your first guess:", "  ........");
+  std::cout << "Enter your first guess:\n  ";
+  for (int i = 0; i < problemLength; i++)
+    std::cout << ".";
+  std::cout << "\n";
 }
 void UX::printRound(int round, const std::vector<Guess> &history, Guess usedChars, int won)
 {
@@ -95,7 +98,7 @@ void UX::printRound(int round, const std::vector<Guess> &history, Guess usedChar
 std::string UX::promptGuess(bool showError)
 {
   if (showError)
-    UX::print("Guesses must compute.");
+    UX::print("Guesses must compute and be the correct length.");
 
   std::string guess{};
   std::cout << "> ";
@@ -124,11 +127,14 @@ std::string UX::wonMsg()
 {
   return Color::setFg(Color::green) + " << YOU WON!" + Color::reset();
 }
-void UX::printLoss()
+void UX::printLoss(std::string answer)
 {
   std::cout << "\n"
             << Color::setFg(Color::red)
-            << "You lose!" << Color::reset() << "\n";
+            << "You lose! Solution: " << Color::reset()
+            << "Solution: "
+            << Color::setColor(Color::black, Color::white)
+            << answer << Color::reset() << "\n\n";
 }
 
 //-----------------
