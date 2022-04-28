@@ -131,7 +131,7 @@ void UX::printLoss(std::string answer)
 {
   std::cout << "\n"
             << Color::setFg(Color::red)
-            << "You lose! Solution: " << Color::reset()
+            << "You lose! " << Color::reset()
             << "Solution: "
             << Color::setColor(Color::black, Color::white)
             << answer << Color::reset() << "\n\n";

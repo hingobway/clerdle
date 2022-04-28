@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
   }
 
   // create this puzzle
-  // Puzzle *puzzle{new Puzzle("1*14-9=5")};
-  Puzzle *puzzle{new Puzzle()};
+  Puzzle *puzzle{new Puzzle("1*14-9=5")};
+  // Puzzle *puzzle{new Puzzle()};
 
   if (mode.isTest()) // in test mode, print the answer first
     UX::printTestAnswer(puzzle->getAnswer());
@@ -48,10 +48,7 @@ int main(int argc, char *argv[])
   // get playername if needed
   std::string playerName{mode.getPlayerName()};
   if (!playerName.length())
-  {
     playerName = UX::promptPlayerName();
-  }
-
   UX::prints("player name: ", playerName, "\n");
 
   Game game(puzzle);

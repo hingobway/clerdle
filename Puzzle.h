@@ -15,6 +15,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 
 #include "Guess.h"
 
@@ -22,6 +23,7 @@ class Puzzle
 {
 private:
   std::string answer_;
+  std::map<char, int> charMatches_;
   std::stringstream answerstream_;
   template <typename T>
   std::string answerToString(T);
@@ -32,6 +34,7 @@ private:
   std::string eqnGenerate222();
   std::string eqnGenerate123();
   std::string eqnGenerate1112();
+  void setMatches();
 
   static void seed();
 
@@ -41,6 +44,7 @@ private:
   static int min(int);
   static int max(int);
 
+  static int splitEqn(std::vector<std::string> &, std::string);
   static int opIterate(std::vector<std::string> &, int = 0);
 
 public:

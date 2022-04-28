@@ -53,11 +53,13 @@ Puzzle::Puzzle()
 
   // create the puzzle and add it to the object's `answer_` member
   this->generateProblem();
+  this->setMatches();
 }
 Puzzle::Puzzle(std::string answer)
 {
   Puzzle::seed();
   this->answer_ = answer;
+  this->setMatches();
 }
 
 /* generateProblem()
@@ -187,28 +189,11 @@ std::string Puzzle::eqnGenerate1112()
 bool Puzzle::verify(std::string guess)
 {
   std::vector<std::string> elements;
-  std::string nbuf{};
 
-  for (char c : guess)
-  {
-    int tryint{c - '0'};
-    if (tryint >= 0 && tryint <= 9)
-    {
-      nbuf += c;
-    }
-    else
-    {
-      elements.push_back(nbuf);
-      nbuf = "";
-      elements.push_back(std::string(1, c));
-    }
-  }
-  if (!elements.size() || *(elements.end() - 1) != "=") // second to last term must be equals sign
+  // splitEqn splits the string into a vector of number and operator strings
+  int givenAnswer{splitEqn(elements, guess)};
+  if (!elements.size())
     return false;
-  elements.pop_back(); // remove equals sign
-
-  // separate given answer and remove it from elements vector
-  int givenAnswer{std::stoi(nbuf)};
 
   // run the recursive iteration function to find answer to provided calculation
   int computedAnswer{opIterate(elements)};
@@ -216,10 +201,52 @@ bool Puzzle::verify(std::string guess)
   return computedAnswer == givenAnswer;
 }
 
+// split equation string into individual elements and return the given answer
+int Puzzle::splitEqn(std::vector<std::string> &elements, std::string guess)
+{
+  std::string nbuf{};
+  for (char c : guess)
+  {
+    int tryint{c - '0'};
+    if (tryint >= 0 && tryint <= 9)
+    { // if char is a digit, add to the number buffer
+      nbuf += c;
+    }
+    else
+    { // otherwise reset the number buffer and add this char (an operator) separately
+      elements.push_back(nbuf);
+      nbuf = "";
+      elements.push_back(std::string(1, c));
+    }
+  }
+  if (!elements.size() || *(elements.end() - 1) != "=")
+  { // if second to last term is not "=", fail and exit
+    elements.clear();
+    return 0;
+  }
+
+  // separate given answer and remove it from elements vector
+  elements.pop_back();
+  int givenAnswer{};
+  try
+  {
+    givenAnswer = std::stoi(nbuf);
+  }
+  catch (std::invalid_argument const &err)
+  { // if answer is not a number, fail and exit
+    (void)err;
+    elements.clear();
+    return 0;
+  }
+
+  return givenAnswer;
+}
+
 /* opIterate()
- *   this is a recursive function that iterates over an equation in
- *   string vector form. the vector contains numbers and operators in
- *   order. the function will return the solution as an integer.
+ *   this function iterates over an equation in string vector form. the
+ *   vector contains numbers and operators in order. the function will
+ *   return the solution as an integer. THIS FUNC. IS DESTRUCTIVE TO THE
+ *   ELEMENTS VECTOR.
  */
 int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
 {
@@ -242,7 +269,6 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
         stage = 1;
         break;
       }
-
       if (el[0] == '/' && a % b)
       { // if any division doesn't result in an integer, immediately exit
 
@@ -263,24 +289,48 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
 
   if (!stage) // mult. & div. is complete. continue to add. & subt.
     return opIterate(elements, 1);
-  else // the equation is solved
-    return std::stoi(elements.at(0));
+  else // the equation is solved (as long as the solution is a number)
+  {
+    int out{};
+    try
+    {
+      out = std::stoi(elements.at(0));
+    }
+    catch (std::invalid_argument const &err)
+    {
+      (void)err;
+      return false;
+    }
+    return out;
+  }
 }
 
+void Puzzle::setMatches()
+{ // find the number of each char in the correct answer for nearby char counting.
+  this->charMatches_.clear();
+  for (char c : this->answer_)
+  {
+    if (this->charMatches_[c])
+      this->charMatches_[c]++;
+    else
+      this->charMatches_[c] = 1;
+  }
+}
+
+/* compare()
+ *   this function compares a guess string to the puzzle answer. it does
+ *   this in 2 passes, first marking all correct and incorrect answers
+ *   and tallying the matches for each character. then it goes back
+ *   through to enforce the correct number of nearby matches for each
+ *   char.
+ */
 Guess Puzzle::compare(std::string input) const
 {
   Guess guess(input);
-  std::vector<char> nearbys;
-  std::map<char, int> correctCharCounts{};
+  std::map<char, int> correctCharCounts{this->charMatches_};
   std::map<char, int> charMatches{};
   for (auto c : this->answer_)
-  {
     charMatches[c] = 0;
-    if (correctCharCounts[c])
-      correctCharCounts[c]++;
-    else
-      correctCharCounts[c] = 1;
-  }
 
   for (int i = 0; i < int(this->answer_.length()); i++)
   {

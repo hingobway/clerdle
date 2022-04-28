@@ -1,7 +1,16 @@
-// TODO header block
+// /////////////////////////////////////////////////////////
+//
+// File:   clerdle/Guess.h
+// Author: Michael Foster
+// Date:   2022.04.29
+//
+// This is the header file for Guess.cpp.
+// See that file for more information.
+//
+// /////////////////////////////////////////////////////////
 
-#ifndef GUESSCHAR_H
-#define GUESSCHAR_H
+#ifndef GUESS_H
+#define GUESS_H
 
 #include <vector>
 #include <string>
@@ -13,12 +22,12 @@ class Guess
 public:
   enum charState
   {
-    null,
-    empty,
-    unknown,
-    incorrect,
-    nearby,
-    correct
+    null,      // no data - use default/old value
+    empty,     // no char assigned yet
+    unknown,   // unguessed char (usedChars only)
+    incorrect, // no match at all
+    nearby,    // right char, wrong place
+    correct    // right char, right place
   };
 
   struct GuessChar
@@ -40,27 +49,4 @@ private:
   std::vector<GuessChar> guess_;
 };
 
-#endif
-
-////////////////////////////
-// NON-OOP FORM OPTION \/ //
-
-#if 0
-namespace
-{
-  enum charState
-  {
-    empty,
-    unknown,
-    incorrect,
-    nearby,
-    correct
-  };
-
-  struct GuessChar
-  {
-    char character;
-    charState state;
-  };
-}
 #endif

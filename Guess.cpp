@@ -1,4 +1,15 @@
-// TODO header block
+// /////////////////////////////////////////////////////////
+//
+// File:   clerdle/Guess.cpp
+// Author: Michael Foster
+// Date:   2022.04.29
+//
+// The Guess class is used as a type throughout the program.
+// Its purpose is to store a string with a status message
+// for each character. This is used to display guesses, as
+// well as the "used characters" display in each round.
+//
+// /////////////////////////////////////////////////////////--
 #include "Guess.h"
 //--------------//
 
@@ -8,7 +19,7 @@
 #define EMPTY_CHAR '.'
 
 Guess::Guess(int length)
-{
+{ // default ctor: build empty string of given length
   this->guess_.reserve(length);
   for (int i = 0; i < length; i++)
   {
@@ -16,7 +27,7 @@ Guess::Guess(int length)
   }
 }
 Guess::Guess(std::string input, int length)
-{
+{ // var ctor: init with specified values from passed string
   this->guess_.reserve(length);
   for (int i = 0; i < length; i++)
   {
@@ -27,7 +38,7 @@ Guess::Guess(std::string input, int length)
 }
 
 void Guess::setInd(int index, GuessChar guesschar)
-{
+{ // set the char or state of a single character in the guess
   if (index < int(this->guess_.size()))
   {
     // allow the option to only set state OR character
@@ -39,7 +50,7 @@ void Guess::setInd(int index, GuessChar guesschar)
   }
 }
 void Guess::set(const std::vector<GuessChar> &guess)
-{
+{ // set the entire guesss manually (or the first n chars)
   int itlen = (guess.size() < this->guess_.size()) ? guess.size() : this->guess_.size();
   for (int i = 0; i < itlen; i++)
   {
