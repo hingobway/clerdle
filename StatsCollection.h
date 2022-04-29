@@ -12,6 +12,17 @@
 #ifndef STATSCOLLECT_H
 #define STATSCOLLECT_H
 
-//
+#include <vector>
+
+#include "Player.h"
+
+class Stats
+{
+private:
+  std::vector<Player> players_;
+
+public:
+  Stats();
+};
 
 #endif

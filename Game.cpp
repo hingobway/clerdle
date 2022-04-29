@@ -66,7 +66,7 @@ void Game::play()
       {
         if (c2.character == c.character)
         {
-          if (c.state == Guess::correct || !(c2.state == Guess::correct || c2.state == Guess::nearby))
+          if (c.state == Guess::correct || c2.state != Guess::nearby)
             c2.state = c.state;
           break;
         }

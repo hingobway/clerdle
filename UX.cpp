@@ -103,7 +103,6 @@ std::string UX::promptGuess(bool showError)
   std::string guess{};
   std::cout << "> ";
   std::getline(std::cin, guess);
-  // TODO validate input
   return guess;
 }
 void UX::printHistory(const std::vector<Guess> &rounds, int won, int buffer)
@@ -135,6 +134,19 @@ void UX::printLoss(std::string answer)
             << "Solution: "
             << Color::setColor(Color::black, Color::white)
             << answer << Color::reset() << "\n\n";
+}
+
+bool UX::promptReplay()
+{
+  std::cout << "\nPlay again? [y/N]  ";
+  std::string input{};
+  std::getline(std::cin, input);
+  if (input.length() && (input[0] == 'y' || input[0] == 'Y'))
+  {
+    std::cout << "\n";
+    return true;
+  }
+  return false;
 }
 
 //-----------------

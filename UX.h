@@ -37,6 +37,7 @@ public:
   static void printRound(int, const std::vector<Guess> &, Guess, int = 0);
   static std::string promptGuess(bool = false);
   static void printLoss(std::string);
+  static bool promptReplay();
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }

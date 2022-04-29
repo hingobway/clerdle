@@ -45,7 +45,8 @@ private:
   static int max(int);
 
   static int splitEqn(std::vector<std::string> &, std::string);
-  static int opIterate(std::vector<std::string> &, int = 0);
+  static int opIterate(std::vector<std::string> &);
+  static void reduceEqnVector(std::vector<std::string> &, int = 0);
 
 public:
   Puzzle();

@@ -21,6 +21,7 @@
 #include "UX.h"
 #include "Puzzle.h"
 #include "Game.h"
+#include "StatsCollection.h"
 
 int main(int argc, char *argv[])
 {
@@ -30,19 +31,18 @@ int main(int argc, char *argv[])
   // print logo
   UX::welcome(mode.isTest() ? "test" : "");
 
+  if (args.size() && args.at(0) == "--stats")
+  {
+    Stats();
+    return 0;
+  }
+
   if (mode.isGenerate())
   { // for -g mode, print some answers and exit
     for (int i = 0; i < mode.isGenerate(); i++)
       UX::prints(Puzzle().getAnswer(), '(', i + 1, ')');
     return 0;
   }
-
-  // create this puzzle
-  // Puzzle *puzzle{new Puzzle("1*14-9=5")};
-  Puzzle *puzzle{new Puzzle()};
-
-  if (mode.isTest()) // in test mode, print the answer first
-    UX::printTestAnswer(puzzle->getAnswer());
 
   // TODO should this go in a Game() default ctor?
   // get playername if needed
@@ -51,21 +51,30 @@ int main(int argc, char *argv[])
     playerName = UX::promptPlayerName();
   UX::prints("player name: ", playerName, "\n");
 
-  Game game(puzzle);
-  if (game.won())
+  Puzzle *puzzle{};
+  bool playAgain{};
+  do
   {
-    UX::prints("STATS: game won in", game.getRounds(), "rounds.");
-  }
-  else
-  {
-    UX::prints("STATS: game lost.");
-  }
+    puzzle = new Puzzle();
 
-  // TODO move to UX
-  std::cout << "\nPress ENTER to exit... ";
-  std::string dump{};
-  std::getline(std::cin, dump);
-  (void)dump;
+    if (mode.isTest()) // in test mode, print the answer first
+      UX::printTestAnswer(puzzle->getAnswer());
+
+    Game game(puzzle);
+    if (game.won())
+    {
+      UX::prints("STATS: game won in", game.getRounds(), "rounds.");
+    }
+    else
+    {
+      UX::prints("STATS: game lost.");
+    }
+
+    playAgain = UX::promptReplay();
+
+    delete puzzle;
+    puzzle = nullptr;
+  } while (playAgain);
 
   return 0;
 }

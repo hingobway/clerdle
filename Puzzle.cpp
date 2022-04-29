@@ -232,9 +232,8 @@ int Puzzle::splitEqn(std::vector<std::string> &elements, std::string guess)
   {
     givenAnswer = std::stoi(nbuf);
   }
-  catch (std::invalid_argument const &err)
+  catch (std::invalid_argument const &)
   { // if answer is not a number, fail and exit
-    (void)err;
     elements.clear();
     return 0;
   }
@@ -248,7 +247,31 @@ int Puzzle::splitEqn(std::vector<std::string> &elements, std::string guess)
  *   return the solution as an integer. THIS FUNC. IS DESTRUCTIVE TO THE
  *   ELEMENTS VECTOR.
  */
-int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
+int Puzzle::opIterate(std::vector<std::string> &elements)
+{
+  // calculate all * and / terms
+  Puzzle::reduceEqnVector(elements, 0);
+  if (!elements.size())
+    return 0x7fffffff; // 01111111111111111111111111111111.  max int value will always fail validation
+  // calculate all + and - terms
+  Puzzle::reduceEqnVector(elements, 1);
+  if (int(elements.size()) != 1) // if this is more than 1,
+    return 0x7fffffff;
+
+  // check that the answer is a number, then return it
+  int out{};
+  try
+  {
+    out = std::stoi(elements.at(0));
+  }
+  catch (std::invalid_argument const &)
+  {
+    return 0x7fffffff; // max int value will always fail validation
+  }
+  return out;
+}
+
+void Puzzle::reduceEqnVector(std::vector<std::string> &elements, int stage)
 {
   for (int i = 0; i < int(elements.size()); i++)
   {
@@ -262,18 +285,14 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
         a = std::stoi(elements.at(i - 1));
         b = std::stoi(elements.at(i + 1));
       }
-      catch (std::invalid_argument const &err)
+      catch (std::invalid_argument const &)
       { // if there were 2 operators in a row, immediately exit
-        (void)err;
-        elements.at(0) = "2147483647"; // max int value will always fail validation
-        stage = 1;
+        elements.clear();
         break;
       }
       if (el[0] == '/' && a % b)
       { // if any division doesn't result in an integer, immediately exit
-
-        elements.at(0) = "2147483647"; // max int value will always fail validation
-        stage = 1;
+        elements.clear();
         break;
       }
 
@@ -285,23 +304,6 @@ int Puzzle::opIterate(std::vector<std::string> &elements, int stage)
       // if this was successful we need to start from the beginning
       i = 0;
     }
-  }
-
-  if (!stage) // mult. & div. is complete. continue to add. & subt.
-    return opIterate(elements, 1);
-  else // the equation is solved (as long as the solution is a number)
-  {
-    int out{};
-    try
-    {
-      out = std::stoi(elements.at(0));
-    }
-    catch (std::invalid_argument const &err)
-    {
-      (void)err;
-      return false;
-    }
-    return out;
   }
 }
 
