@@ -31,11 +31,7 @@ int main(int argc, char *argv[])
   // print logo
   UX::welcome(mode.isTest() ? "test" : "");
 
-  if (args.size() && args.at(0) == "--stats")
-  {
-    Stats();
-    return 0;
-  }
+  Stats stats{};
 
   if (mode.isGenerate())
   { // for -g mode, print some answers and exit
@@ -61,19 +57,17 @@ int main(int argc, char *argv[])
       UX::printTestAnswer(puzzle->getAnswer());
 
     Game game(puzzle);
-    if (game.won())
-    {
-      UX::prints("STATS: game won in", game.getRounds(), "rounds.");
-    }
-    else
-    {
-      UX::prints("STATS: game lost.");
-    }
+    UX::print("before recording");
+    stats.recordGame(playerName, game.won() ? game.getRounds() : 0);
+    UX::print("after recording");
+    // UX::printHistogram(playerName, stats.getPlayerStats(playerName));
 
     playAgain = UX::promptReplay();
 
     delete puzzle;
     puzzle = nullptr;
+
+    UX::print("puzzle deleted");
   } while (playAgain);
 
   return 0;

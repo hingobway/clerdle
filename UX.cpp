@@ -13,10 +13,16 @@
 //-----------//
 
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <string>
+#include <vector>
+#include <cmath>
 
 #include "color.h"
 #include "Guess.h"
+
+#define HISTOGRAM_WIDTH 50
 
 void UX::welcome()
 {
@@ -147,6 +153,63 @@ bool UX::promptReplay()
     return true;
   }
   return false;
+}
+
+//-----------------
+
+void UX::printHistogram(std::string name, std::vector<int> data)
+{
+  if (!data.size())
+    return;
+
+  int total{};
+  for (int i : data)
+    total += i;
+  if (!total)
+    return;
+
+  std::stringstream buffer;
+  buffer << std::fixed << std::setw(3);
+  buffer << "Player:         " << name << "\n";
+  buffer << "Games Won:      " << total - data.at(0) << "/" << total;
+  UX::streamSingleBar(buffer, total - data.at(0), total);
+  for (int i = 1; i < int(data.size()); i++)
+  {
+    buffer << "Won in " << i << ((i == 1) ? "try:  " : "tries:")
+           << data.at(i) << "/" << total;
+    UX::streamSingleBar(buffer, data.at(i), total);
+  }
+  buffer << "\n";
+  std::cout << buffer.str();
+}
+void UX::streamSingleBar(std::stringstream &stream, int x, int total)
+{
+  double ratio = double(x) / double(total);
+  std::string percent = std::to_string((int)std::round(ratio * 100.0)) + "%";
+
+  stream << "    ";
+  for (int i = 0; i < HISTOGRAM_WIDTH; i++)
+  {
+    if (double(i) / double(HISTOGRAM_WIDTH) < ratio)
+    {
+      stream << Color::setColor(Color::black, Color::green);
+    }
+    if (i < int(percent.length()))
+    {
+      stream << percent.at(i);
+    }
+    else
+    {
+      stream << " ";
+    }
+    stream << Color::reset() << "\n";
+  }
+}
+
+void UX::printCSVParseError()
+{
+  std::cout << "WARNING: some imported player data values were invalid and have been reset to 0. "
+            << "Exit now (Ctrl+C) to avoid overwriting your data file.\n\n";
 }
 
 //-----------------

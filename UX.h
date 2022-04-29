@@ -13,7 +13,9 @@
 #define UX_H
 
 #include <string>
+#include <vector>
 #include <iostream>
+#include <sstream>
 
 #include "color.h"
 #include "Guess.h"
@@ -27,6 +29,8 @@ private:
   static void printHistory(const std::vector<Guess> &, int, int = 0);
   static std::string wonMsg();
 
+  static void streamSingleBar(std::stringstream &, int, int);
+
 public:
   static void welcome();
   static void welcome(std::string);
@@ -38,6 +42,9 @@ public:
   static std::string promptGuess(bool = false);
   static void printLoss(std::string);
   static bool promptReplay();
+
+  static void printCSVParseError();
+  static void printHistogram(std::string, std::vector<int>);
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }

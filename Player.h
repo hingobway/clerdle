@@ -23,13 +23,16 @@ private:
 
 public:
   Player() : name_{}, history_{} {}
+  Player(std::string name) : name_{name}, history_{} {}
 
   std::string getName() const { return name_; }
   std::map<std::string, int> getHistory() const { return history_; }
+  int getOne(std::string);
 
   void setName(std::string name) { name_ = name; }
   void setHistory(const std::map<std::string, int> &);
   void setOne(std::string, int);
+  void increment(std::string);
 };
 
 #endif

@@ -290,7 +290,7 @@ void Puzzle::reduceEqnVector(std::vector<std::string> &elements, int stage)
         elements.clear();
         break;
       }
-      if (el[0] == '/' && a % b)
+      if (el[0] == '/' && (b == 0 || a % b))
       { // if any division doesn't result in an integer, immediately exit
         elements.clear();
         break;
