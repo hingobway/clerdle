@@ -35,9 +35,11 @@ public:
   static void welcome();
   static void welcome(std::string);
 
+  static void printHelp();
   static void printTestAnswer(std::string);
   static std::string promptPlayerName();
   static void printPlayerName(std::string);
+
   static void printGameStart(int);
   static void printRound(int, const std::vector<Guess> &, Guess, int = 0);
   static std::string promptGuess(bool = false);

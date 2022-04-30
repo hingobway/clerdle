@@ -18,7 +18,7 @@
 #include "Puzzle.h"
 #include "UX.h"
 
-AppMode::AppMode(const std::vector<std::string> &args) : test_{0}, generate_{0}, stats_{0}, playerName_{}, quit_{0}
+AppMode::AppMode(const std::vector<std::string> &args) : test_{0}, generate_{0}, stats_{0}, help_{0}, playerName_{}, quit_{0}
 {
   if (args.size() && args.at(0)[0] == '-')
   {
@@ -54,6 +54,9 @@ AppMode::AppMode(const std::vector<std::string> &args) : test_{0}, generate_{0},
       if (int(args.size()) > 1)
         this->playerName_ = args.at(1);
       break;
+    case 'h':
+      this->help_ = true;
+      break;
     }
   }
   else
@@ -65,6 +68,11 @@ AppMode::AppMode(const std::vector<std::string> &args) : test_{0}, generate_{0},
 
 bool AppMode::executeSimpleModes(Stats &stats)
 {
+  if (this->isHelp())
+  {
+    this->quit_ = true;
+    UX::printHelp();
+  }
   if (this->isGenerate())
   { // print a number of example puzzles
     this->quit_ = true;

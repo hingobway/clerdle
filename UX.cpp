@@ -60,6 +60,20 @@ std::string UX::colorMap(Guess::charState state)
   return out;
 }
 
+void UX::printHelp()
+{
+  std::cout << "-- CLI ARGUMENTS -- key: [optional arg] <required arg>\n\n"
+            << "Normal mode:     clerdle [player name]\n"
+            << "                  => regular gameplay\n"
+            << "Test mode:       clerdle -t [player name]\n"
+            << "                  => shows the answer at the beginning of each round\n"
+            << "Show stats:      clerdle -s [player name]\n"
+            << "                  => show user stats. when a name is passed it will display only that user.\n"
+            << "                     when no name is passed, all users will be shown.\n"
+            << "Generation test: clerdle -g <number>\n"
+            << "                  => generate n puzzles and display them.\n\n";
+}
+
 //-----------------
 
 void UX::printTestAnswer(std::string answer)

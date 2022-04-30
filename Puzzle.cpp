@@ -7,7 +7,7 @@
 // This file generates and tracks a new puzzle.
 //
 // /////////////////////////////////////////////////////////
-#include "puzzle.h"
+#include "Puzzle.h"
 //---------------//
 
 #include <cstdlib>

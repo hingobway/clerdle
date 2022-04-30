@@ -35,10 +35,12 @@ int main(int argc, char *argv[])
   if (mode.executeSimpleModes(stats)) // run non-game modes based on cli args
     return 0;
 
+  // get player name
   if (!playerName.length())
     playerName = UX::promptPlayerName();
   UX::printPlayerName(playerName);
 
+  // MAIN game loop
   Puzzle *puzzle{};
   bool playAgain{};
   do
@@ -46,6 +48,7 @@ int main(int argc, char *argv[])
     puzzle = new Puzzle();
     Game game(puzzle, mode.isTest() ? Game::testMode : Game::null);
 
+    // record stats from this round and print user data
     stats.recordGame(playerName, game.won() ? game.getRounds() : 0);
     UX::printHistogram(playerName, stats.getPlayerStats(playerName));
 

@@ -23,6 +23,7 @@ private:
   bool test_;
   int generate_;
   bool stats_;
+  bool help_;
   std::string playerName_;
 
   bool quit_;
@@ -35,6 +36,7 @@ public:
   bool isTest() const { return test_; }
   int isGenerate() const { return generate_; }
   bool isStats() const { return stats_; }
+  bool isHelp() const { return help_; }
   std::string getPlayerName() const { return playerName_; }
 };
 
