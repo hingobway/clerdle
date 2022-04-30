@@ -250,6 +250,10 @@ void UX::errorNoGenNumber()
 {
   std::cout << "You must pass a valid number along with -g.\n\n";
 }
+void UX::errorFileUnavailable()
+{
+  std::cout << "\nWARNING: The player_data file is currently in use and could not be edited.\n\n";
+}
 
 //-----------------
 

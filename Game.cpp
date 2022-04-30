@@ -48,11 +48,11 @@ void Game::play()
 {
   UX::printGameStart(this->puzzle_->getAnswer().length());
   for (int i = 0; i < NUM_ROUNDS; i++)
-  {
+  { // ROUND loop
     std::string guess{};
     int attempt{};
     while (true)
-    {
+    { // get a guess
       guess = UX::promptGuess(bool(attempt));
       if (guess.length() == this->puzzle_->getAnswer().length() && Puzzle::verify(guess))
         break;
@@ -62,7 +62,7 @@ void Game::play()
     auto newChars = this->usedChars_.getVector();
     int correctCount{};
     for (auto &c : this->rounds_.at(i).getVector())
-    { // TODO clean this
+    {
       if (c.state == Guess::correct)
         correctCount++;
       for (auto &c2 : newChars)

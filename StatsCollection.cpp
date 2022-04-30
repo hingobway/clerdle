@@ -25,69 +25,14 @@
 
 Stats::Stats() : HEADER_MAP{D_HEADER_MAP}
 {
-  std::vector<std::string> headers{};
-
   std::ifstream file(FILENAME);
   if (file.is_open())
   {
-    std::string buffer{};
-    bool parseErr{};
-    int row{};
-    while (std::getline(file, buffer))
-    {
-      Player *player{};
-      if (row)
-      {
-        this->players_.push_back(new Player());
-        player = *(this->players_.end() - 1);
-      }
-
-      std::smatch match;
-      int col{};
-      while (std::regex_search(buffer, match, std::regex("(?:\\\\,|[^,])+"))) // separate by comma and optional quotes, escaping `\,`
-      {
-        std::string value{std::regex_replace(match.str(), std::regex("\\\\([,])"), "$1")}; // remove backslashes from char escapes
-        buffer = match.suffix().str();
-        if (!row)
-          headers.push_back(value);
-        else
-        {
-          if (headers.at(col) == D_NAME_HEADER)
-          {
-            std::regex_search(value, match, std::regex("^\\s*[\"“”]((?:\\\\[\"“”]|[^\"“”])+)[\"“”]\\s*$")); // try to match string wrapped in quotes
-            value = match.str(1).length() ? match.str(1) : value;                                           // if no match, continue with no-quotes value
-            player->setName(std::regex_replace(value, std::regex("\\\\([\"“”])"), "$1"));
-          }
-          else if (std::find(this->HEADER_MAP.begin(), this->HEADER_MAP.end(), headers.at(col)) != this->HEADER_MAP.end())
-          { // ignore any unrecognized columns
-            int num{};
-            try
-            {
-              num = std::stoi(value);
-            }
-            catch (std::invalid_argument const &)
-            {
-              parseErr = true;
-            }
-            catch (std::out_of_range const &)
-            {
-              parseErr = true;
-            }
-            player->setOne(headers.at(col), num);
-          }
-        }
-        col++;
-      }
-      row++;
-    }
+    bool parsed{this->parseFile(file)};
     file.close();
 
-    if (parseErr)
+    if (!parsed)
       UX::errorCSVParse();
-  }
-  else
-  {
-    // TODO do we need this?
   }
 }
 Stats::~Stats()
@@ -97,6 +42,64 @@ Stats::~Stats()
   for (Player *p : this->players_)
     delete p;
   this->players_.clear();
+}
+
+bool Stats::parseFile(std::ifstream &file)
+{
+  std::vector<std::string> headers{};
+  std::string buffer{};
+  bool parseErr{};
+  int row{};
+  while (std::getline(file, buffer))
+  {
+    Player *player{};
+    if (row)
+    {
+      this->players_.push_back(new Player());
+      player = *(this->players_.end() - 1);
+    }
+
+    std::smatch match;
+    int col{};
+    while (std::regex_search(buffer, match, std::regex("(?:\\\\,|[^,])+"))) // separate by comma and optional quotes, escaping `\,`
+    {
+      std::string value{std::regex_replace(match.str(), std::regex("\\\\([,])"), "$1")}; // remove backslashes from char escapes
+      buffer = match.suffix().str();
+      if (!row)
+        headers.push_back(value);
+      else
+      {
+        if (!(col < int(headers.size())))
+          break;
+        if (headers.at(col) == D_NAME_HEADER)
+        {
+          std::regex_search(value, match, std::regex("^\\s*[\"“”]((?:\\\\[\"“”]|[^\"“”])+)[\"“”]\\s*$")); // try to match string wrapped in quotes
+          value = match.str(1).length() ? match.str(1) : value;                                           // if no match, continue with no-quotes value
+          player->setName(std::regex_replace(value, std::regex("\\\\([\"“”])"), "$1"));
+        }
+        else if (std::find(this->HEADER_MAP.begin(), this->HEADER_MAP.end(), headers.at(col)) != this->HEADER_MAP.end())
+        { // ignore any unrecognized columns
+          int num{};
+          try
+          {
+            num = std::stoi(value);
+          }
+          catch (std::invalid_argument const &)
+          {
+            parseErr = true;
+          }
+          catch (std::out_of_range const &)
+          {
+            parseErr = true;
+          }
+          player->setOne(headers.at(col), num);
+        }
+      }
+      col++;
+    }
+    row++;
+  }
+  return !parseErr;
 }
 
 void Stats::storeFile()
@@ -128,7 +131,7 @@ void Stats::storeFile()
   }
   else
   {
-    UX::print("TODO CATCH THIS");
+    UX::errorFileUnavailable();
   }
 }
 

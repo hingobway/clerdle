@@ -26,6 +26,7 @@ private:
   std::vector<Player *> players_;
   Player *findPlayer(std::string, bool = true);
 
+  bool parseFile(std::ifstream &);
   void storeFile();
 
 public:

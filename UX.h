@@ -51,6 +51,7 @@ public:
   static void errorCSVParse();
   static void errorUserNotFound();
   static void errorNoGenNumber();
+  static void errorFileUnavailable();
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }
