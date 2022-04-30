@@ -10,6 +10,10 @@ $(out_file): $(objs)
 
 $(objs): %.o: %.cpp $(headers)
 
-.PHONY: clean
+prod: $(out_file) cleanProd
+
+.PHONY: clean cleanProd
 clean:
 	rm -f *.o $(out_file)
+cleanProd:
+	rm -f *.o
