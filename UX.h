@@ -37,14 +37,18 @@ public:
 
   static void printTestAnswer(std::string);
   static std::string promptPlayerName();
+  static void printPlayerName(std::string);
   static void printGameStart(int);
   static void printRound(int, const std::vector<Guess> &, Guess, int = 0);
   static std::string promptGuess(bool = false);
   static void printLoss(std::string);
   static bool promptReplay();
 
-  static void printCSVParseError();
   static void printHistogram(std::string, std::vector<int>);
+
+  static void errorCSVParse();
+  static void errorUserNotFound();
+  static void errorNoGenNumber();
 
   template <typename T>
   static void print(T el) { std::cout << el << "\n"; }

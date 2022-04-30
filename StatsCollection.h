@@ -23,15 +23,19 @@ private:
   const std::vector<std::string> HEADER_MAP;
   std::ofstream fileout_;
 
-  std::vector<Player> players_;
-  Player &findPlayer(std::string);
+  std::vector<Player *> players_;
+  Player *findPlayer(std::string, bool = true);
+
+  void storeFile();
 
 public:
   Stats();
   ~Stats();
 
   void recordGame(std::string, int);
-  std::vector<int> getPlayerStats(std::string);
+  std::vector<int> getPlayerStats(std::string, bool = true);
+  std::vector<int> getPlayerStats(Player *);
+  std::map<std::string, std::vector<int>> getAllPlayerStats();
 };
 
 #endif

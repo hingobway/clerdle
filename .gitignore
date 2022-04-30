@@ -1,4 +1,5 @@
 *.exe
+*.o
 000
 clerdle
 player_data.csv

@@ -20,8 +20,11 @@
 #define NUM_ROUNDS 6
 #define ALLOWED_CHARS "1234567890+-*/="
 
-Game::Game(Puzzle *puzzle) : puzzle_{puzzle}, completedRounds_{0}
+Game::Game(Puzzle *puzzle, Game::state state) : puzzle_{puzzle}, completedRounds_{0}
 {
+  if (state == Game::testMode) // in test mode, print the answer first
+    UX::printTestAnswer(this->puzzle_->getAnswer());
+
   this->rounds_.reserve(NUM_ROUNDS);
   for (int i = 0; i < NUM_ROUNDS; i++)
   {

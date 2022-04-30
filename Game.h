@@ -32,7 +32,13 @@ private:
   void play();
 
 public:
-  Game(Puzzle *);
+  enum state
+  {
+    null,
+    testMode
+  };
+
+  Game(Puzzle *, state = null);
 
   bool won() const { return won_; }
   int getRounds() const { return completedRounds_; }

@@ -35,9 +35,12 @@ Stats::Stats() : HEADER_MAP{D_HEADER_MAP}
     int row{};
     while (std::getline(file, buffer))
     {
+      Player *player{};
       if (row)
-        this->players_.push_back(Player());
-      auto &player = *(this->players_.end() - 1);
+      {
+        this->players_.push_back(new Player());
+        player = *(this->players_.end() - 1);
+      }
 
       std::smatch match;
       int col{};
@@ -53,7 +56,7 @@ Stats::Stats() : HEADER_MAP{D_HEADER_MAP}
           {
             std::regex_search(value, match, std::regex("^\\s*[\"“”]((?:\\\\[\"“”]|[^\"“”])+)[\"“”]\\s*$")); // try to match string wrapped in quotes
             value = match.str(1).length() ? match.str(1) : value;                                           // if no match, continue with no-quotes value
-            player.setName(std::regex_replace(value, std::regex("\\\\([\"“”])"), "$1"));
+            player->setName(std::regex_replace(value, std::regex("\\\\([\"“”])"), "$1"));
           }
           else if (std::find(this->HEADER_MAP.begin(), this->HEADER_MAP.end(), headers.at(col)) != this->HEADER_MAP.end())
           { // ignore any unrecognized columns
@@ -70,7 +73,7 @@ Stats::Stats() : HEADER_MAP{D_HEADER_MAP}
             {
               parseErr = true;
             }
-            player.setOne(headers.at(col), num);
+            player->setOne(headers.at(col), num);
           }
         }
         col++;
@@ -80,13 +83,7 @@ Stats::Stats() : HEADER_MAP{D_HEADER_MAP}
     file.close();
 
     if (parseErr)
-      UX::printCSVParseError();
-
-    // TODO remove
-    // for (auto n : this->players_.at(0).getHistory())
-    // {
-    //   UX::prints("player", this->players_.at(0).getName(), n.first, "=", n.second);
-    // }
+      UX::errorCSVParse();
   }
   else
   {
@@ -94,6 +91,15 @@ Stats::Stats() : HEADER_MAP{D_HEADER_MAP}
   }
 }
 Stats::~Stats()
+{
+  this->storeFile();
+
+  for (Player *p : this->players_)
+    delete p;
+  this->players_.clear();
+}
+
+void Stats::storeFile()
 {
   this->fileout_.open(FILENAME);
   if (this->fileout_.is_open())
@@ -107,17 +113,18 @@ Stats::~Stats()
     }
     this->fileout_ << "\n";
 
-    for (auto &p : this->players_)
+    for (Player *p : this->players_)
     {
-      this->fileout_ << "\"" << std::regex_replace(p.getName(), std::regex("([,\"“”])"), "\\$1") << "\",";
+      this->fileout_ << "\"" << std::regex_replace(p->getName(), std::regex("([,\"“”])"), "\\$1") << "\",";
       for (auto it = this->HEADER_MAP.begin(); it != this->HEADER_MAP.end(); it++)
       {
-        this->fileout_ << p.getOne(*it);
+        this->fileout_ << p->getOne(*it);
         if (it != this->HEADER_MAP.end() - 1)
           this->fileout_ << ",";
       }
       this->fileout_ << "\n";
     }
+    this->fileout_.close();
   }
   else
   {
@@ -127,18 +134,39 @@ Stats::~Stats()
 
 void Stats::recordGame(std::string name, int rounds)
 {
-  Player &player = this->findPlayer(name);
-  UX::print("player found.");
-  player.increment(this->HEADER_MAP.at(rounds));
+  Player *player = this->findPlayer(name);
+  player->increment(this->HEADER_MAP.at(rounds));
+
+  this->storeFile();
 }
-std::vector<int> Stats::getPlayerStats(std::string name)
+std::vector<int> Stats::getPlayerStats(std::string name, bool create)
 {
   std::vector<int> out{};
-  std::map<std::string, int> history{this->findPlayer(name).getHistory()};
+  Player *p = this->findPlayer(name, create);
+  if (p == nullptr)
+    return out;
+  std::map<std::string, int> history{p->getHistory()};
   for (int i = 0; i < int(this->HEADER_MAP.size()); i++)
   {
     out.push_back(history[this->HEADER_MAP.at(i)]);
   }
+  return out;
+}
+std::vector<int> Stats::getPlayerStats(Player *player)
+{
+  std::vector<int> out{};
+  std::map<std::string, int> history{player->getHistory()};
+  for (int i = 0; i < int(this->HEADER_MAP.size()); i++)
+  {
+    out.push_back(history[this->HEADER_MAP.at(i)]);
+  }
+  return out;
+}
+std::map<std::string, std::vector<int>> Stats::getAllPlayerStats()
+{
+  std::map<std::string, std::vector<int>> out;
+  for (auto p : this->players_)
+    out[p->getName()] = Stats::getPlayerStats(p);
   return out;
 }
 
@@ -147,16 +175,21 @@ std::vector<int> Stats::getPlayerStats(std::string name)
  *   if the player can't be found, a new player will be created with that
  *   name.
  */
-Player &Stats::findPlayer(std::string name)
+Player *Stats::findPlayer(std::string name, bool create)
 {
   std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-  for (auto &player : this->players_)
+  for (Player *p : this->players_)
   {
-    std::string lname{player.getName()};
-    std::transform(lname.begin(), lname.end(), lname.end(), ::tolower);
-    if (lname != name)
-      return player;
+    std::string lname{p->getName()};
+    std::transform(lname.begin(), lname.end(), lname.begin(), ::tolower);
+    if (lname == name)
+      return p;
   }
-  this->players_.push_back(Player(name));
-  return *(this->players_.end() - 1);
+  if (create)
+  {
+    this->players_.push_back(new Player(name));
+    return *(this->players_.end() - 1);
+  }
+  else
+    return nullptr;
 }

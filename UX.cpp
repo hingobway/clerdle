@@ -23,6 +23,7 @@
 #include "Guess.h"
 
 #define HISTOGRAM_WIDTH 50
+#define MIN_NUM_LEN 3
 
 void UX::welcome()
 {
@@ -84,6 +85,12 @@ std::string UX::promptPlayerName()
   }
   return name;
 }
+
+void UX::printPlayerName(std::string name)
+{
+  UX::prints("player name: ", name, "\n");
+}
+
 void UX::printGameStart(int problemLength)
 {
   std::cout << "Enter your first guess:\n  ";
@@ -168,15 +175,28 @@ void UX::printHistogram(std::string name, std::vector<int> data)
   if (!total)
     return;
 
+  int len{int(std::to_string(total).length())};
+  if (len < MIN_NUM_LEN)
+    len = MIN_NUM_LEN;
+
   std::stringstream buffer;
-  buffer << std::fixed << std::setw(3);
-  buffer << "Player:         " << name << "\n";
-  buffer << "Games Won:      " << total - data.at(0) << "/" << total;
+  buffer << std::fixed << "\n ";
+  buffer << Color::setColor(Color::black, Color::white)
+         << " Player: " << Color::setFg(Color::blue)
+         << name << " " << Color::reset() << "\n";
+  buffer << Color::setColor(Color::black, Color::yellow)
+         << "Games Won:      " << Color::setFg(Color::blue)
+         << std::setw(len) << total - data.at(0) << Color::setFg(Color::black)
+         << "/" << std::left << std::setw(len) << total << std::right
+         << " " << Color::reset();
   UX::streamSingleBar(buffer, total - data.at(0), total);
   for (int i = 1; i < int(data.size()); i++)
   {
-    buffer << "Won in " << i << ((i == 1) ? "try:  " : "tries:")
-           << data.at(i) << "/" << total;
+    buffer << "Won in " << i << ((i == 1) ? " try:   " : " tries: ")
+           << Color::setFg(Color::cyan)
+           << std::setw(len) << data.at(i) << Color::reset()
+           << "/" << std::left << std::setw(len) << total << std::right
+           << " ";
     UX::streamSingleBar(buffer, data.at(i), total);
   }
   buffer << "\n";
@@ -187,7 +207,7 @@ void UX::streamSingleBar(std::stringstream &stream, int x, int total)
   double ratio = double(x) / double(total);
   std::string percent = std::to_string((int)std::round(ratio * 100.0)) + "%";
 
-  stream << "    ";
+  stream << "   ";
   for (int i = 0; i < HISTOGRAM_WIDTH; i++)
   {
     if (double(i) / double(HISTOGRAM_WIDTH) < ratio)
@@ -195,21 +215,26 @@ void UX::streamSingleBar(std::stringstream &stream, int x, int total)
       stream << Color::setColor(Color::black, Color::green);
     }
     if (i < int(percent.length()))
-    {
       stream << percent.at(i);
-    }
     else
-    {
       stream << " ";
-    }
-    stream << Color::reset() << "\n";
+    stream << Color::reset();
   }
+  stream << Color::reset() << "\n";
 }
 
-void UX::printCSVParseError()
+void UX::errorCSVParse()
 {
   std::cout << "WARNING: some imported player data values were invalid and have been reset to 0. "
             << "Exit now (Ctrl+C) to avoid overwriting your data file.\n\n";
+}
+void UX::errorUserNotFound()
+{
+  std::cout << "That user does not exist.\n\n";
+}
+void UX::errorNoGenNumber()
+{
+  std::cout << "You must pass a valid number along with -g.\n\n";
 }
 
 //-----------------

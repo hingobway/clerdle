@@ -27,47 +27,32 @@ int main(int argc, char *argv[])
 {
   std::vector<std::string> args(argv + 1, argv + argc);
   AppMode mode(args);
+  std::string playerName{mode.getPlayerName()};
 
-  // print logo
-  UX::welcome(mode.isTest() ? "test" : "");
+  UX::welcome(mode.isTest() ? "test" : ""); // print logo
 
   Stats stats{};
-
-  if (mode.isGenerate())
-  { // for -g mode, print some answers and exit
-    for (int i = 0; i < mode.isGenerate(); i++)
-      UX::prints(Puzzle().getAnswer(), '(', i + 1, ')');
+  if (mode.executeSimpleModes(stats)) // run non-game modes based on cli args
     return 0;
-  }
 
-  // TODO should this go in a Game() default ctor?
-  // get playername if needed
-  std::string playerName{mode.getPlayerName()};
   if (!playerName.length())
     playerName = UX::promptPlayerName();
-  UX::prints("player name: ", playerName, "\n");
+  UX::printPlayerName(playerName);
 
   Puzzle *puzzle{};
   bool playAgain{};
   do
   {
     puzzle = new Puzzle();
+    Game game(puzzle, mode.isTest() ? Game::testMode : Game::null);
 
-    if (mode.isTest()) // in test mode, print the answer first
-      UX::printTestAnswer(puzzle->getAnswer());
-
-    Game game(puzzle);
-    UX::print("before recording");
     stats.recordGame(playerName, game.won() ? game.getRounds() : 0);
-    UX::print("after recording");
-    // UX::printHistogram(playerName, stats.getPlayerStats(playerName));
+    UX::printHistogram(playerName, stats.getPlayerStats(playerName));
 
     playAgain = UX::promptReplay();
 
     delete puzzle;
     puzzle = nullptr;
-
-    UX::print("puzzle deleted");
   } while (playAgain);
 
   return 0;
