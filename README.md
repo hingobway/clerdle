@@ -7,7 +7,11 @@ A command-line port of the game [nerdle](https://nerdlegame.com). Final project 
 open a terminal in the project directory and run
 
 ```sh
+# regular compile
 make prod
+
+# compile and remove code files
+make prod cleaninstall
 ```
 
 the file `clerdle` is now the standalone app and can be moved anywhere. the code can be deleted.

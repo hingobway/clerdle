@@ -2,6 +2,6 @@
 # it will build and run the app, and then prevent it from closing 
 # instantly at the end.
 
-make
+make prod
 ./clerdle
 read -p "Press ENTER to close."

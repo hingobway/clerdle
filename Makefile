@@ -17,3 +17,5 @@ clean:
 	rm -f *.o $(out_file)
 cleanProd:
 	rm -f *.o
+cleaninstall:
+	rm -f *.cpp *.h
