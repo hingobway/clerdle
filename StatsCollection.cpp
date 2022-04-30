@@ -180,12 +180,13 @@ std::map<std::string, std::vector<int>> Stats::getAllPlayerStats()
  */
 Player *Stats::findPlayer(std::string name, bool create)
 {
-  std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+  std::string passedName{name};
+  std::transform(passedName.begin(), passedName.end(), passedName.begin(), ::tolower);
   for (Player *p : this->players_)
   {
     std::string lname{p->getName()};
     std::transform(lname.begin(), lname.end(), lname.begin(), ::tolower);
-    if (lname == name)
+    if (lname == passedName)
       return p;
   }
   if (create)
